@@ -122,6 +122,17 @@ Either run `node post.js` with no `IMAGE_PATH`, or — in a session where the tw
 MCP tools are loaded — call the `post_tweet` MCP tool with the approved text. (Note:
 MCP tools added via `claude mcp add` only load after a session restart.)
 
+### Deleting a tweet
+To remove a tweet (e.g. to re-post with a different screenshot), pass its id:
+
+```bash
+cd <skill-dir>
+node post.js delete <tweet-id>
+```
+
+Prints `DELETED {"deleted":true}` on success. The id is the one from `POSTED_OK` or
+the tail of the `https://x.com/i/status/<id>` link.
+
 ## Credential gotchas (learned the hard way)
 If posting fails, the error `detail` tells you exactly what's wrong:
 - `client-not-enrolled` (403) → the app is a **Standalone App**, not inside a
