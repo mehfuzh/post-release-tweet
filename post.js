@@ -12,6 +12,10 @@
 // highlights. Repo is taken from $REPO, then config.json's "repo", then gh's cwd
 // inference.
 //
+// Other subcommands:
+//   node post.js last-tweet [<count>]  # print the account's recent tweets as JSON
+//   node post.js delete <tweet-id>     # delete a tweet (e.g. to re-post with a new image)
+//
 // Env overrides (API_KEY / API_SECRET_KEY / ACCESS_TOKEN / ACCESS_TOKEN_SECRET)
 // take precedence over the values pulled from ~/.claude.json if provided.
 
@@ -119,6 +123,26 @@ if (process.argv[2] === 'last-tweet') {
       console.log(JSON.stringify(tweets, null, 2));
     } catch (e) {
       console.error('TIMELINE_FAILED:', e.data ? JSON.stringify(e.data) : e.message);
+      process.exit(1);
+    }
+  })();
+  return;
+}
+
+// Delete a tweet by id (e.g. to re-post with a different screenshot).
+//   node post.js delete <tweet-id>
+if (process.argv[2] === 'delete') {
+  const id = process.argv[3] || process.env.TWEET_ID;
+  if (!id) {
+    console.error('delete requires a tweet id: node post.js delete <tweet-id>');
+    process.exit(1);
+  }
+  (async () => {
+    try {
+      const res = await client.v2.deleteTweet(id);
+      console.log('DELETED', JSON.stringify(res.data));
+    } catch (e) {
+      console.error('DELETE_FAILED:', e.data ? JSON.stringify(e.data) : e.message);
       process.exit(1);
     }
   })();
