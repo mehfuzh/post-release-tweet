@@ -41,3 +41,26 @@ approval, and post it (with media if you provide a screenshot).
 
 See [`SKILL.md`](./SKILL.md) for the full format, posting flow, and credential
 troubleshooting.
+
+## Author
+
+**Mehfuz Hossain** ([@mehfuzh](https://github.com/mehfuzh))
+
+## Contributing
+
+Contributions are welcome!
+
+1. Fork the repo and create a feature branch off `main`
+   (e.g. `git checkout -b my-change`).
+2. Make your change. If you touch `post.js`, keep it dependency-light and run
+   `node -c post.js` to sanity-check syntax; update [`SKILL.md`](./SKILL.md) when you
+   change behavior.
+3. Never commit secrets or a `config.json` — both are git-ignored for a reason.
+4. Open a pull request against `main` describing the change and how you tested it.
+
+For bugs or ideas, please open a
+[GitHub issue](https://github.com/mehfuzh/post-release-tweet/issues).
+
+## License
+
+Released under the [MIT License](./LICENSE) © 2026 Mehfuz Hossain.
