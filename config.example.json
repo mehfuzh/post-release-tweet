@@ -1,5 +1,6 @@
 {
   "product": "Your Product",
   "tagline": "Your one-line tagline here.",
-  "hashtags": ["#YourTag", "#launch"]
+  "hashtags": ["#YourTag", "#launch"],
+  "repo": "owner/name"
 }
