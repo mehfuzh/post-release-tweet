@@ -20,18 +20,59 @@ same skill works for any product.
 - All 4 must come from **one** X app that sits under a Project with **Read+Write**
   permission — see "Credential gotchas" below.
 - **(Optional) Brand config:** copy `config.example.json` to `config.json` and fill in
-  your product name, tagline, and hashtags. If `config.json` is absent, ask the user
-  for these values instead. `config.json` is git-ignored so brand details / forks stay
-  local.
+  your product name, tagline, hashtags, and (optionally) `repo` (`owner/name`) to pull
+  release notes from GitHub. If `config.json` is absent, ask the user for these values
+  instead. `config.json` is git-ignored so brand details / forks stay local.
 
 ## Inputs to gather from the user
 - **Product name** — from `config.json` if present, else ask.
 - **Version** (e.g. `1.0.27`).
-- **Highlights** — the 1–4 headline features/fixes to call out.
+- **Highlights** — the 1–4 headline features/fixes to call out. If `gh` is configured,
+  pull these from the GitHub Releases page instead of asking (see "Pulling highlights
+  from GitHub Releases" below); otherwise ask the user.
 - **Screenshot** (optional) — a path or an attached image. macOS screenshots often
   live at `~/Desktop/Screenshot *.png` and use a **narrow no-break space** before
   "AM/PM", so match them with a glob (`ls ~/Desktop/Screenshot*<time>*.png`), not a
   literal path.
+
+## Pulling highlights from GitHub Releases (when `gh` is configured)
+When the GitHub CLI is available and authenticated, source the highlights from the
+project's Releases page instead of asking the user to type them out. The fetch is
+built into `post.js`:
+
+```bash
+cd <skill-dir>
+node post.js release <VERSION>   # a specific tag; omit <VERSION> for the latest release
+REPO=owner/name node post.js release 1.0.27   # override the repo explicitly
+```
+
+- **Repo resolution:** `$REPO` → `repo` in `config.json` → `gh`'s cwd inference. If
+  none resolve and you're not inside the repo, ask the user which repo to read.
+- **Tag matching:** the helper tries the tag as given, then with/without a leading
+  `v`, then falls back sensibly. It prints the release as JSON
+  (`{name, tagName, body}`) on stdout.
+- **If `gh` isn't usable:** the helper exits non-zero with `GH_UNAVAILABLE` (not
+  installed / not authenticated) or `RELEASE_NOT_FOUND`. In that case, fall back to
+  asking the user for the highlights.
+- **Distill the body:** the `body` is markdown changelog text — extract the 1–4 most
+  user-facing items and rephrase each as a short benefit (don't paste raw changelog
+  lines or commit subjects).
+
+## Only tweet what's new (diff against the last release tweet)
+Before drafting, check the account's previous release announcement and drop anything
+already covered there, so the new tweet only calls out genuinely new items:
+
+1. **Fetch recent tweets:** `cd <skill-dir> && node post.js last-tweet` prints the
+   account's recent original tweets as JSON. Identify the most recent
+   release-announcement tweet (starts with `🚀 <PRODUCT> <VERSION> is here!`).
+2. **Diff the highlights:** compare the items you pulled from the new release against
+   what that tweet already announced. Keep only the items **not** in the last release
+   tweet; those are the highlights for the new one.
+3. If `last-tweet` fails (e.g. read access not available on the API tier), note it and
+   proceed with all of the new release's highlights.
+
+Always show the user the highlights you kept and the drafted tweet for approval — these
+helpers only save typing, they don't skip the confirmation gate.
 
 ## Tweet style (house format)
 Keep under 280 characters. Match this structure (fields in `<...>` come from the brand
